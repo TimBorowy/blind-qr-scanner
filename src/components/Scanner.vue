@@ -3,7 +3,8 @@
     <qrcode-stream :camera="camera" @decode="onDecode" @init="onInit"></qrcode-stream>
 
     <p class="decode-result">
-      Laatste scan: <br>
+      Laatste scan:
+      <br />
       <b>{{ result }}</b>
     </p>
   </div>
@@ -12,20 +13,16 @@
 <script>
 import { QrcodeStream } from "vue-qrcode-reader";
 
-const synth = window.speechSynthesis;
-const mapping = [{ display_id: "display_1", dish: "Gebakken aardappeltjes" }];
-let voices;
+import firebase from "firebase/app";
+import "firebase/firestore";
 
-setTimeout(() => {
-  voices = synth.getVoices();
-  console.log(voices);
+firebase.initializeApp({
+  apiKey: "AIzaSyC7BbhS7sLqWrzId1wRr3XBMteSUe1rtz0",
+  authDomain: "blind-qr-scan-app.firebaseapp.com",
+  projectId: "blind-qr-scan-app"
+});
 
-  const utterThis = new SpeechSynthesisUtterance(
-    "Welkom in buffet restaurant 'Doe het lekker zelf' "
-  );
-  utterThis.voice = voices.find(v => v.lang === "nl-NL");
-  synth.speak(utterThis);
-}, 1050);
+const db = firebase.firestore();
 
 export default {
   components: { QrcodeStream },
@@ -34,8 +31,18 @@ export default {
     return {
       isValid: undefined,
       camera: "auto",
-      result: null
+      result: null,
+      voices: [],
+      synth: window.speechSynthesis
     };
+  },
+  created: () => {},
+  mounted: function() {
+    setTimeout(() => {
+      this.voices = this.synth.getVoices();
+      console.log(this.voices);
+      this.speak("Welkom in buffet restaurant 'Doe het lekker zelf'")
+    }, 1000);
   },
   methods: {
     onInit(promise) {
@@ -46,18 +53,31 @@ export default {
       this.isValid = undefined;
     },
 
+    speak(text) {
+      this.synth.cancel();
+      const utterThis = new SpeechSynthesisUtterance(text);
+      utterThis.voice = this.voices.find(v => v.lang === "nl-NL");
+      this.synth.speak(utterThis);
+    },
+
     async onDecode(content) {
       window.navigator.vibrate([100, 100, 100]);
       this.turnCameraOff();
 
-      const dishResult = mapping.find(d => d.display_id === content);
-      console.log(dishResult);
-      this.result = dishResult.dish;
-
-      synth.cancel();
-      const utterThis = new SpeechSynthesisUtterance(dishResult.dish);
-      utterThis.voice = voices.find(v => v.lang === "nl-NL");
-      synth.speak(utterThis);
+      var docRef = db.collection("signs").doc(content);
+      try {
+        const doc = await docRef.get();
+        if (doc.exists) {
+          console.log("Document data:", doc.data());
+          this.result = doc.data().dish;
+          this.speak(this.result)
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.log("Error getting document:", error);
+      }
 
       // Add some delay so multiple scans are prevented
       await this.timeout(750);
