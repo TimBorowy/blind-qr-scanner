@@ -1,4 +1,8 @@
-# blind-qr-scanner
+# Blind QR Scanner
+
+![](project-image.png)
+
+A special scanner blind people can use to navigate buffet restaurants themselves
 
 ## Project setup
 ```
@@ -14,6 +18,11 @@ npm run serve
 ```
 npm run build
 ```
+Then run
+```
+firebase deploy -m "optional message"
+```
+To the deploy the files in the "dist" folder
 
 ### Lints and fixes files
 ```
