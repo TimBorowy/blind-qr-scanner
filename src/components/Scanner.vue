@@ -1,12 +1,19 @@
 <template>
   <div>
-    <qrcode-stream :camera="camera" @decode="onDecode" @init="onInit"></qrcode-stream>
+    <nav>
+      <router-link class="button" to="/menu">Restaurant Menu</router-link>
+      <router-link class="button" to="/menu">Hoe te gebruiken</router-link>
+    </nav>
+    <div>
+      <qrcode-stream :camera="camera" @decode="onDecode" @init="onInit"></qrcode-stream>
+    </div>
 
     <p class="decode-result">
       Laatste scan:
       <br />
       <b>{{ result }}</b>
     </p>
+    
   </div>
 </template>
 
@@ -61,23 +68,34 @@ export default {
     },
 
     async onDecode(content) {
-      window.navigator.vibrate([100, 100, 100]);
+
+      // Safari ios does not support vibrate
+      if(window.navigator.vibrate){
+        window.navigator.vibrate([100, 100, 100]);
+      }
+
       this.turnCameraOff();
 
-      var docRef = db.collection("signs").doc(content);
-      try {
-        const doc = await docRef.get();
-        if (doc.exists) {
-          console.log("Document data:", doc.data());
-          this.result = doc.data().dish;
-          this.speak(this.result)
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
+      // Check if code is part of our system
+      if(content.includes("display")){
+        var docRef = db.collection("signs").doc(content);
+        try {
+          const doc = await docRef.get();
+          if (doc.exists) {
+            console.log("Document data:", doc.data());
+            this.result = doc.data().dish;
+            this.speak(this.result)
+          } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.log("Error getting document:", error);
         }
-      } catch (error) {
-        console.log("Error getting document:", error);
+      } else {
+        this.result = "Deze code is geen onderdeel van de restaurantervaring"
       }
+
 
       // Add some delay so multiple scans are prevented
       await this.timeout(750);
@@ -108,8 +126,9 @@ video {
   width: 100%;
 }
 p {
+  margin: 10px;
   font-family: sans-serif;
-  font-size: 2em;
+  font-size: 1.5em;
   text-align: center;
 }
 </style>

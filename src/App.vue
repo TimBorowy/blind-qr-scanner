@@ -1,29 +1,46 @@
 <template>
   <div id="app">
-    <Scanner msg="Welcome to Your Vue.js App"/>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Scanner from './components/Scanner.vue'
 
 export default {
   name: 'App',
   components: {
-    Scanner
   }
 }
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
 body {
   margin: 0;
+  background-color: #690E08
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  color: #FFF;
+}
+.button{
+  display: inline-block;
+  Padding: 10px 15px 10px 5px;
+  margin: 5px;
+  border-radius: 3px;
+  border: 1px solid #FFF;
+  background-color: #FFF;
+  color: #690E08;
+  font-style: italic;
+  font-weight: bold;
+}
+nav{
+  margin: 5px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 </style>
