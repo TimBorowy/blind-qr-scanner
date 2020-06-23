@@ -1,7 +1,7 @@
 <template>
   <div>
     <nav>
-      <router-link class="button" to="/">Borden scanner</router-link>
+      <router-link class="button" to="/" role="button" tabindex="0">Borden scanner</router-link>
     </nav>
     <main>
       <h1>Menu</h1>

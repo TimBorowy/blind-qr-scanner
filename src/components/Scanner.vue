@@ -1,18 +1,18 @@
 <template>
   <div>
     <nav>
-      <router-link class="button" to="/menu">Restaurant Menu</router-link>
-      <router-link class="button" to="/menu">Hoe te gebruiken</router-link>
+      <router-link class="button" to="/menu" role="button" tabindex="0">Restaurant Menu</router-link>
+      <router-link class="button" to="/menu" role="button" tabindex="1">Hoe te gebruiken</router-link>
     </nav>
     <div>
       <qrcode-stream :camera="camera" @decode="onDecode" @init="onInit"></qrcode-stream>
     </div>
 
-    <p class="decode-result">
+    <h1 class="decode-result">
       Laatste scan:
       <br />
       <b>{{ result }}</b>
-    </p>
+    </h1>
     
   </div>
 </template>
@@ -125,7 +125,8 @@ export default {
 video {
   width: 100%;
 }
-p {
+h1 {
+  font-weight: normal;
   margin: 10px;
   font-family: sans-serif;
   font-size: 1.5em;
